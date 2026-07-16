@@ -1,0 +1,18 @@
+node_modules
+
+# build artifacts
+.nitro
+.tanstack
+.wrangler
+.output
+.vinxi
+dist
+
+# env
+.env
+.env.local
+.env.*.local
+
+# OS / editor
+.DS_Store
+*.log
