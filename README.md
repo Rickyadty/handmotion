@@ -1,4 +1,4 @@
-# Jemari
+# Jemari (mediapipe-handmotion)
 
 A simple demo of **Google MediaPipe Gesture Recognizer** built with React.
 
