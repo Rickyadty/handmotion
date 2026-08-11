@@ -202,8 +202,6 @@ export default function HandTracker() {
                         ctx.clip();
                         ctx.filter = filter;
                         if (mode === "mosaic") {
-                            // Downscale the region then scale it back up with smoothing
-                            // off to get chunky pixel blocks.
                             const blockPx = 16;
                             const sw = Math.max(1, Math.round(w / blockPx));
                             const sh = Math.max(1, Math.round(h / blockPx));
@@ -286,19 +284,23 @@ export default function HandTracker() {
 
     return (
         <div
-            className="light min-h-screen bg-[#f4ecdd] text-[#2e2a20]"
-            data-theme="light"
+            className="dark relative min-h-screen overflow-hidden bg-gray text-white"
+            data-theme="dark"
         >
-            <div className="mx-auto max-w-6xl px-6 py-10">
-                <header className="mb-8">
-                    <h1 className="text-2xl font-semibold tracking-tight">Hand Tracker</h1>
-                    <p className="mt-1 text-sm text-[#8f8474]">
-                        Real-time hand skeleton tracking with MediaPipe.
-                    </p>
+
+            <div className="pointer-events-none fixed inset-0 overflow-hidden">
+                <div className="absolute -left-40 -top-40 h-[26rem] w-[26rem] rounded-full bg-[#d73ba0]/40 blur-[130px]" />
+                <div className="absolute right-[-6rem] top-1/4 h-[28rem] w-[28rem] rounded-full bg-[#19c7e2]/30 blur-[140px]" />
+                <div className="absolute bottom-[-8rem] left-1/3 h-[26rem] w-[26rem] rounded-full bg-[#6d54e0]/35 blur-[130px]" />
+            </div>
+
+            <div className="relative mx-auto max-w-6xl px-6 py-10">
+                <header className="mb-4">
+                    <h1 className="text-2xl font-semibold tracking-tight text-white drop-shadow-sm">Hand Tracker</h1>
                 </header>
 
                 <div className="flex flex-col gap-6 lg:flex-row">
-                    <div className="relative aspect-video flex-1 overflow-hidden rounded-2xl border border-[#e4dac6] bg-[#efe7d6] shadow-sm">
+                    <div className="relative aspect-video flex-1 overflow-hidden rounded-3xl border border-white/15 bg-white/5 shadow-2xl shadow-black/40 backdrop-blur-2xl">
                         <video
                             ref={videoRef}
                             autoPlay
@@ -332,27 +334,29 @@ export default function HandTracker() {
                         </AnimatePresence>
 
                         {!cameraOn && (
-                            <div className="absolute inset-0 grid place-items-center bg-[#efe7d6] text-sm text-[#9c9284]">
+                            <div className="absolute inset-0 grid place-items-center bg-white/5 text-sm text-white/50 backdrop-blur-xl">
                                 Camera is off
                             </div>
                         )}
                         {cameraOn && !ready && !error && (
-                            <div className="absolute inset-0 grid place-items-center text-sm text-[#9c9284]">
+                            <div className="absolute inset-0 grid place-items-center text-sm text-white/60">
                                 Loading model…
                             </div>
                         )}
                         {error && (
-                            <div className="absolute inset-0 grid place-items-center px-6 text-center text-sm text-red-600">
+                            <div className="absolute inset-0 grid place-items-center bg-red-500/10 px-6 text-center text-sm text-red-300 backdrop-blur-xl">
                                 {error}
                             </div>
                         )}
 
                         {cameraOn && ready && !error && (
-                            <div className="absolute left-3 top-3 flex items-center gap-2 bg-white/80 rounded-full px-3 py-1 text-xs backdrop-blur">
+                            <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white/90 shadow-lg shadow-black/20 backdrop-blur-md">
                                 <span
                                     className={cnm(
                                         "size-2 rounded-full",
-                                        handsDetected > 0 ? "bg-green-500" : "bg-neutral-500"
+                                        handsDetected > 0
+                                            ? "bg-emerald-400 shadow-[0_0_6px_2px_rgba(52,211,153,0.55)]"
+                                            : "bg-white/40"
                                     )}
                                 />
                                 {handsDetected > 0
@@ -362,7 +366,7 @@ export default function HandTracker() {
                         )}
 
                         {cameraOn && ready && !error && effectMode && (
-                            <div className="absolute right-3 top-3 rounded-full bg-white/80 px-3 py-1 text-xs font-medium capitalize backdrop-blur">
+                            <div className="absolute right-3 top-3 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium capitalize text-white/90 shadow-lg shadow-black/20 backdrop-blur-md">
                                 {effectMode}
                             </div>
                         )}
@@ -372,21 +376,21 @@ export default function HandTracker() {
                                 {gestures.map((g, i) => (
                                     <div
                                         key={i}
-                                        className="flex items-center gap-2 rounded-lg bg-white/80 px-3 py-1.5 text-xs backdrop-blur"
+                                        className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-xs text-white/90 shadow-lg shadow-black/20 backdrop-blur-md"
                                     >
                                         <span className="font-medium">
                                             Hand {i + 1}
                                             {g.handedness && (
-                                                <span className="text-[#9c9284]">
+                                                <span className="text-white/50">
                                                     {" "}
                                                     ({g.handedness})
                                                 </span>
                                             )}
                                             :
                                         </span>
-                                        <span className="text-[#d73ba0]">{g.gesture}</span>
+                                        <span className="text-[#ff8fd6]">{g.gesture}</span>
                                         {g.score > 0 && (
-                                            <span className="text-[#9c9284]">
+                                            <span className="text-white/50">
                                                 {Math.round(g.score * 100)}%
                                             </span>
                                         )}
@@ -396,14 +400,16 @@ export default function HandTracker() {
                         )}
                     </div>
 
-                    <Card className="w-full shrink-0 border-[#e4dac6] bg-[#fbf7ec] lg:w-80">
+                    <Card className="w-full shrink-0 border border-white/15 bg-white/10 shadow-2xl shadow-black/40 backdrop-blur-2xl lg:w-80">
                         <Card.Header>
-                            <Card.Title>Settings</Card.Title>
-                            <Card.Description>Tune tracking and display.</Card.Description>
+                            <Card.Title className="text-white">Settings</Card.Title>
+                            <Card.Description className="text-white/60">
+                                Tune tracking and display.
+                            </Card.Description>
                         </Card.Header>
                         <Card.Content className="flex flex-col gap-6">
-                            <label className="flex items-center justify-between gap-2">
-                                <span className="text-sm">Number of hands</span>
+                            {/* <label className="flex items-center justify-between gap-2">
+                                <span className="text-sm text-white/80">Number of hands</span>
                                 <input
                                     type="number"
                                     min={1}
@@ -418,17 +424,17 @@ export default function HandTracker() {
                                         }
                                     }}
                                     onBlur={() => setHandsText(String(numHands))}
-                                    className="w-16 rounded-lg border border-[#e4dac6] bg-white px-3 py-1.5 text-center text-sm outline-none focus:border-[#d6c9ad]"
+                                    className="w-16 rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-center text-sm text-white outline-none backdrop-blur-md transition-colors focus:border-white/40 focus:bg-white/15"
                                 />
-                            </label>
+                            </label> */}
 
-                            <div className="flex flex-col gap-4 border-t border-[#e8e0cf] pt-6">
+                            <div className="flex flex-col gap-4 border-t border-white/15 pt-6">
                                 <Switch
                                     className="w-full"
                                     isSelected={cameraOn}
                                     onChange={setCameraOn}
                                 >
-                                    <Switch.Content className="w-full justify-between">
+                                    <Switch.Content className="w-full justify-between text-white/90">
                                         Camera
                                         <Switch.Control>
                                             <Switch.Thumb />
@@ -441,7 +447,7 @@ export default function HandTracker() {
                                     isSelected={skeletonOn}
                                     onChange={setSkeletonOn}
                                 >
-                                    <Switch.Content className="w-full justify-between">
+                                    <Switch.Content className="w-full justify-between text-white/90">
                                         Skeleton overlay
                                         <Switch.Control>
                                             <Switch.Thumb />
@@ -454,7 +460,7 @@ export default function HandTracker() {
                                     isSelected={effectOn}
                                     onChange={setEffectOn}
                                 >
-                                    <Switch.Content className="w-full justify-between">
+                                    <Switch.Content className="w-full justify-between text-white/90">
                                         Pinch effect
                                         <Switch.Control>
                                             <Switch.Thumb />
@@ -462,9 +468,6 @@ export default function HandTracker() {
                                     </Switch.Content>
                                 </Switch>
 
-                                <p className="text-xs text-[#9c9284]">
-                                    Use index and thumb fingers to activate fun effects.
-                                </p>
                             </div>
                         </Card.Content>
                     </Card>
